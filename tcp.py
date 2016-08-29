@@ -87,6 +87,7 @@ class TcpClient(Tcp):
         self.tcpCliSock=socket(AF_INET,SOCK_STREAM)
     def INIT(self):
         self.tcpCliSock.connect(self.address)
+	self.tcpCliSock.settimeout(2)
     def communication(self):
         while True:
 	    socketList=[sys.stdin,self.tcpCliSock]

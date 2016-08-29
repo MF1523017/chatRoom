@@ -7,8 +7,14 @@ Created on Thu Jul 21 16:11:06 2016
 
 
 from tcp import TcpClient
+import sys
 
 if __name__=='__main__':
-    tc=TcpClient('localhost',23456,1024)#change the ipaddr if you use the code
+    if len(sys.argv)<3:
+	print 'Usage:python client.py hostname port'
+	sys.exit()
+    host=sys.argv[1]
+    port=int(sys.argv[2])
+    tc=TcpClient(host,port,1024)#change the ipaddr if you use the code
     tc.build()
     tc.communication()
