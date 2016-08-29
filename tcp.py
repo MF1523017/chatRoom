@@ -9,7 +9,7 @@ Created on Thu Jul 21 15:38:02 2016
 from socket import *
 import select#select 模块提供了异步I/O
 import threading
-import os
+import sys
 class Tcp:
     def __init__(self,HOST,PORT,BUFSIZE):
         self.host=HOST
@@ -42,21 +42,45 @@ class TcpServer(Tcp):
         Tcp.__init__(self,HOST,PORT,BUFSIZE)
         self.tcpSerSock=socket(AF_INET,SOCK_STREAM)
 	if CONNECTIONS is None:
-	    CONNECTIONS=[]		
+	    CONNECTIONS=[]
+	self.CONNECTIONS=CONNECTIONS		
     def INIT(self):
         self.tcpSerSock.bind(self.address)
         self.tcpSerSock.listen(5)
+	self.CONNECTIONS.append(self.tcpSerSock)
+	print 'Chat Server stared on port {}'.format(self.port)
     def communication(self):
         print 'waiting for connection...'
         while True:
-            self.tcpCliSock,addr=self.tcpSerSock.accept()
-            print '...connected from:',addr
-            while True:
-                self.buildThread()
-
+	    readSock,writeSock,errorSock=select.select(self.CONNECTIONS,[],[])
+	    for sock in readSock:
+		if sock==self.tcpSerSock:
+            	    tcpCliSock,addr=self.tcpSerSock.accept()
+            	    print '...connected from:',addr
+	    	    self.CONNECTIONS.append(tcpCliSock)
+		    self.broadcastData(tcpCliSock,'[{}]entered room'.format(addr))
+		else:
+		    try:
+			data=sock.recv(self.bufferSize)
+			if data:
+			    self.broadcastData(sock,'r'+' '+data)
+		    except:
+			self.broacastData(sock,'Client {} is offline '.format(addr))
+			print 'Client {} is offline '.format(addr)
+			sock.close()
+			self.CONNECTIONS.remove(sock)
+			continue
+		
     def __del__(self):
         self.tcpSerSock.close()
-    def broadcast_data(self,message)
+    def broadcastData(self,sock,message):
+	for socket in self.CONNECTIONS:
+	    if socket!=self.tcpSerSock and socket!=sock:
+		try:
+		    socket.send(message)
+		except:
+		    socket.close()
+		    self.CONNECTIONS.remove(socket)
 class TcpClient(Tcp):
     def __init__(self,HOST,PORT,BUFSIZE):
         Tcp.__init__(self,HOST,PORT,BUFSIZE)
@@ -65,7 +89,23 @@ class TcpClient(Tcp):
         self.tcpCliSock.connect(self.address)
     def communication(self):
         while True:
-            self.buildThread()
+	    socketList=[sys.stdin,self.tcpCliSock]
+	    readSock,writeSock,errorSock=select.select(socketList,[],[])
+	    for sock in readSock:
+		if sock==self.tcpCliSock:
+		    data=sock.recv(self.bufferSize)
+		    if not data:
+			print '\nDisconnected from chat server'
+			sys.exit()
+		    else:
+			sys.stdout.write(data)
+			self.prompt()
+		else:
+		    msg=sys.stdin.readline()
+		    self.tcpCliSock.send(msg)
+		    self.prompt()
     def __del__(self):
         self.tcpCliSock.close()
-    
+    def prompt(self):
+	sys.stdout.write('<You>')
+	sys.stdout.flush() 
