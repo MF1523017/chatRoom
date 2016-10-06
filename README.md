@@ -6,10 +6,10 @@
 
 ##server.py:
 you should change the port and the buffersize 
-## usage :
+### usage :
 >python server.py 
 ##client.py
-##usage:
+### usage:
 >python client.py hostname(ip address) port
 ##USAGE:
 * 1 open a terminal
