@@ -1,15 +1,15 @@
 #chatRoom
 ##tcp.py:
 * class Tcp 
-* class TcpServer(Tcp) 
-* class TcpClient(Tcp) 
 
 ##server.py:
+* class TcpServer(Tcp) 
 you should change the port and the buffersize 
 ### usage :
 >python server.py 
 
 ##client.py
+* class TcpClient(Tcp) 
 ### usage:
 >python client.py hostname(ip address) 
 
