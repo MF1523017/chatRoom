@@ -10,11 +10,12 @@ from tcp import TcpClient
 import sys
 
 if __name__=='__main__':
-    if len(sys.argv)<3:
-	print 'Usage:python client.py hostname port'
+    if len(sys.argv)!=2:
+	print 'Usage:python client.py hostname'
 	sys.exit()
     host=sys.argv[1]
-    port=int(sys.argv[2])
+    #port=int(sys.argv[2])
+    port=23456
     tc=TcpClient(host,port,1024)#change the ipaddr if you use the code
     tc.build()
     tc.communication()

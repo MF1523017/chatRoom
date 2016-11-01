@@ -11,7 +11,7 @@ you should change the port and the buffersize
 
 ##client.py
 ### usage:
->python client.py hostname(ip address) port
+>python client.py hostname(ip address) 
 
 ##USAGE:
 * 1 open a terminal
